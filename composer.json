@@ -1,0 +1,38 @@
+{
+	"name": "simbacode/moneycake",
+	"description": "The CakePHP Mobile Money library",
+	"type": "library",
+	"keywords": ["pesapal","mobile money"],
+	"homepage": "http://simbacode.com",
+        "version": "0.0.1",
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Acellam Guy",
+			"homepage": "http://mistaguy.com"
+		}
+	],
+	"support": {
+		"issues": "https://github.com/Simbacode/moneycake/issues",
+		"forum": "http://stackoverflow.com/tags/moneycake",
+		"irc": "irc://irc.freenode.org/Moneycake",
+		"source": "https://github.com/Simbacode/moneycake"
+	},
+	"require": {
+		"php": ">=5.4.16",
+                "cakephp/cakephp": "3.0.*-dev"
+	},
+	"require-dev": {
+		"phpunit/phpunit": "*"
+	},
+	"autoload": {
+		"psr-4": {
+			"Simbacode\\": "src"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"Simbacode\\Test\\": "tests"
+		}
+	}
+}
