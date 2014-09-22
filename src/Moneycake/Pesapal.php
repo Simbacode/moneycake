@@ -239,11 +239,10 @@ class Pesapal {
     }
 
     /**
-     * This is to be used with a java services/servlet/web app that you have
-     * configured to be as your pesapal server IPN URL. When the web app
-     * receives the response from Pesapal, Get the parameters and pass the
-     * details to this function so that pesapal gives you the details about the
-     * transaction status in the format:
+     * This is to be used with an action configured to receive IPN as indicated
+     * by pesapal. When the action recieves request from Pesapal, Get the 
+     * parameters and pass the details to this function.
+     * you will receive transaction status in the format:
      * pesapal_notification_type=CHANGE&pesapal_transaction_tracking_id =<the
      * unique tracking id of the transaction>&pesapal_merchant_reference=<the
      * merchant reference>. Also remember to parse the header of this response
