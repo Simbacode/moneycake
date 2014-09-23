@@ -43,6 +43,8 @@ class Pesapal {
     private $url = 'http://demo.pesapal.com/api/PostPesapalDirectOrderV4'; //change to    
     private $http = NULL;
     private $OauthRequest = NUll;
+    private $OauthConsumer = NUll;
+    private $HttpRequest = NUll;
 
     //https://www.pesapal.com/API/PostPesapalDirectOrderV4 when you are ready to go live!
 
@@ -64,11 +66,25 @@ class Pesapal {
     }
 
     /**
-     * A getter method used to return the request that was made to pesapal server
+     * A getter method used to return the Oauth request that was made to pesapal server
      * @return OAuthRequest
      */
     public function getOauthRequest() {
         return $this->OauthRequest;
+    }
+       /**
+     * A getter method used to return the request that was made to pesapal server
+     * @return \Cake\Network\Http\Request
+     */
+    public function getHttpRequest() {
+        return $this->HttpRequest;
+    }
+       /**
+     * A getter method used to return the OauthConsumer used
+     * @return OAuthConsumer
+     */
+    public function getOauthConsumer() {
+        return $this->OauthConsumer;
     }
 
     /**
@@ -96,7 +112,7 @@ class Pesapal {
      * @param phonenumber
      * @param first_name
      * @param last_name
-     * @return String Iframe that contains the payment options
+     * @return OAuthRequest
      */
     public function PostPesapalDirectOrderV4($callback_url, $amount, $desc, $type, $reference, $email, $phonenumber, $first_name, $last_name) {
 
@@ -105,16 +121,15 @@ class Pesapal {
         $post_xml = h($post_xml);
 
 
-        $consumer = new OAuthConsumer($this->consumer_key, $this->consumer_secret);
+        $this->OauthConsumer = new OAuthConsumer($this->consumer_key, $this->consumer_secret);
 
         //post transaction to pesapal
-        $this->OauthRequest = OAuthRequest::from_consumer_and_token($consumer, $this->token, "GET", $this->url, $this->params);
+        $this->OauthRequest = OAuthRequest::from_consumer_and_token($this->OauthConsumer, $this->token, "GET", $this->url, $this->params);
         $this->OauthRequest->set_parameter("oauth_callback", $callback_url);
         $this->OauthRequest->set_parameter("pesapal_request_data", $post_xml);
-        $this->OauthRequest->sign_request($this->signature_method, $consumer, $this->token);
-        $http = new Client();
-        $response = $http->get($this->OauthRequest->to_url());
-        return $response;
+        $this->OauthRequest->sign_request($this->signature_method, $this->OauthConsumer, $this->token);
+        
+        return $this->OauthRequest;
     }
 
     /**
@@ -133,24 +148,22 @@ class Pesapal {
      * 
      * @param String $post_xml
      *            The pespal XML formated order data.Take not of space.
-     * return String Iframe that contains the payment options
+     * return OAuthRequest
      */
     public function PostPesapalDirectOrderV4XML($callback_url, $post_xml) {
         $this->url = $this->http . "pesapal.com/api/PostPesapalDirectOrderV4";
 
         $post_xml = h($post_xml);
 
-        $consumer = new OAuthConsumer($this->consumer_key, $this->consumer_secret);
+        $this->OauthConsumer = new OAuthConsumer($this->consumer_key, $this->consumer_secret);
 
         //post transaction to pesapal
-        $this->OauthRequest = OAuthRequest::from_consumer_and_token($consumer, $this->token, "GET", $this->url, $this->params);
+        $this->OauthRequest = OAuthRequest::from_consumer_and_token($this->OauthConsumer, $this->token, "GET", $this->url, $this->params);
         $this->OauthRequest->set_parameter("oauth_callback", $callback_url);
         $this->OauthRequest->set_parameter("pesapal_request_data", $post_xml);
-        $this->OauthRequest->sign_request($this->signature_method, $consumer, $this->token);
-
-        $http = new Client();
-        $response = $http->get($this->OauthRequest->to_url());
-        return $response;
+        $this->OauthRequest->sign_request($this->signature_method, $this->OauthConsumer, $this->token);
+        
+        return $this->OauthRequest;
     }
 
     /**
@@ -172,16 +185,16 @@ class Pesapal {
 
         $this->url = $this->http . "pesapal.com/API/QueryPaymentStatus";
 
-        $consumer = new OAuthConsumer($this->consumer_key, $this->consumer_secret);
+        $this->OauthConsumer = new OAuthConsumer($this->consumer_key, $this->consumer_secret);
 
         //post transaction to pesapal
-        $this->OauthRequest = OAuthRequest::from_consumer_and_token($consumer, $this->token, "GET", $this->url, $this->params);
+        $this->OauthRequest = OAuthRequest::from_consumer_and_token($this->OauthConsumer, $this->token, "GET", $this->url, $this->params);
         $this->OauthRequest->set_parameter("pesapal_merchant_reference", $reference);
         $this->OauthRequest->set_parameter("pesapal_transaction_tracking_id", $trackingId);
-        $this->OauthRequest->sign_request($this->signature_method, $consumer, $this->token);
+        $this->OauthRequest->sign_request($this->signature_method, $this->OauthConsumer, $this->token);
 
-        $http = new Client();
-        $response = $http->get($this->OauthRequest->to_url());
+        $this->HttpRequest = new Client();
+        $response = $this->HttpRequest->get($this->OauthRequest->to_url());
         return $response;
     }
 
@@ -197,15 +210,15 @@ class Pesapal {
     public function QueryPaymentStatusByMerchantRef($reference) {
         $this->url = $this->http . "pesapal.com/API/QueryPaymentStatusByMerchantRef";
 
-        $consumer = new OAuthConsumer($this->consumer_key, $this->consumer_secret);
+        $this->OauthConsumer = new OAuthConsumer($this->consumer_key, $this->consumer_secret);
 
         //post transaction to pesapal
-        $this->OauthRequest = OAuthRequest::from_consumer_and_token($consumer, $this->token, "GET", $this->url, $this->params);
+        $this->OauthRequest = OAuthRequest::from_consumer_and_token($this->OauthConsumer, $this->token, "GET", $this->url, $this->params);
         $this->OauthRequest->set_parameter("pesapal_merchant_reference", $reference);
-        $this->OauthRequest->sign_request($this->signature_method, $consumer, $this->token);
+        $this->OauthRequest->sign_request($this->signature_method, $this->OauthConsumer, $this->token);
 
-        $http = new Client();
-        $response = $http->get($this->OauthRequest->to_url());
+        $this->HttpRequest = new Client();
+        $response = $this->HttpRequest->get($this->OauthRequest->to_url());
         return $response;
     }
 
@@ -225,16 +238,16 @@ class Pesapal {
 
         $this->url = $this->http . "pesapal.com/API/QueryPaymentDetails";
 
-        $consumer = new OAuthConsumer($this->consumer_key, $this->consumer_secret);
+        $this->OauthConsumer = new OAuthConsumer($this->consumer_key, $this->consumer_secret);
 
         //post transaction to pesapal
-        $this->OauthRequest = OAuthRequest::from_consumer_and_token($consumer, $this->token, "GET", $this->url, $this->params);
+        $this->OauthRequest = OAuthRequest::from_consumer_and_token($this->OauthConsumer, $this->token, "GET", $this->url, $this->params);
         $this->OauthRequest->set_parameter("pesapal_merchant_reference", $reference);
         $this->OauthRequest->set_parameter("pesapal_transaction_tracking_id", $trackingId);
-        $this->OauthRequest->sign_request($this->signature_method, $consumer, $this->token);
+        $this->OauthRequest->sign_request($this->signature_method, $this->OauthConsumer, $this->token);
 
-        $http = new Client();
-        $response = $http->get($this->OauthRequest->to_url());
+        $this->HttpRequest = new Client();
+        $response = $this->HttpRequest->get($this->OauthRequest->to_url());
         return $response;
     }
 
@@ -270,13 +283,13 @@ class Pesapal {
 
         if ($notificationType == "CHANGE" && $trackingId != "") {
 
-            $consumer = new OAuthConsumer($this->consumer_key, $this->consumer_secret);
+            $this->OauthConsumer = new OAuthConsumer($this->consumer_key, $this->consumer_secret);
 
             //get transaction status
-            $this->OauthRequest = OAuthRequest::from_consumer_and_token($consumer, $this->token, "GET", $this->url, $this->params);
+            $this->OauthRequest = OAuthRequest::from_consumer_and_token($this->OauthConsumer, $this->token, "GET", $this->url, $this->params);
             $this->OauthRequest->set_parameter("pesapal_merchant_reference", $reference);
             $this->OauthRequest->set_parameter("pesapal_transaction_tracking_id", $trackingId);
-            $this->OauthRequest->sign_request($this->signature_method, $consumer, $this->token);
+            $this->OauthRequest->sign_request($this->signature_method, $this->OauthConsumer, $this->token);
 
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $this->OauthRequest);
