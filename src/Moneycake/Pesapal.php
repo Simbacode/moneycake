@@ -94,7 +94,7 @@ class Pesapal {
      * Use this to post a transaction to PesaPal. PesaPal will return a response
      * with a page which contains the available payment options and will
      * redirect to your site once the user has completed the payment process. A
-     * tracking id will be returned as a query parameter – this can be used
+     * tracking id will be returned as a query parameter ï¿½ this can be used
      * subsequently to track the payment status on pesapal for this transaction.
      *
      * @param String  $callback_url 
@@ -114,10 +114,10 @@ class Pesapal {
      * @param last_name
      * @return OAuthRequest
      */
-    public function PostPesapalDirectOrderV4($callback_url, $amount, $desc, $type, $reference, $email, $phonenumber, $first_name, $last_name) {
+    public function PostPesapalDirectOrderV4($callback_url, $amount,$currency, $desc, $type, $reference, $email, $phonenumber, $first_name, $last_name) {
 
         $this->url = $this->http . "pesapal.com/api/PostPesapalDirectOrderV4";
-        $post_xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><PesapalDirectOrderInfo xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" Amount=\"".$amount."\" Description=\"".$desc."\" Type=\"".$type."\" Reference=\"".$reference."\" FirstName=\"".$first_name."\" LastName=\"".$last_name."\" Email=\"".$email."\" PhoneNumber=\"".$phonenumber."\" xmlns=\"http://www.pesapal.com\" />";
+        $post_xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><PesapalDirectOrderInfo xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" Amount=\"".$amount."\" Currency=\"".$currency."\" Description=\"".$desc."\" Type=\"".$type."\" Reference=\"".$reference."\" FirstName=\"".$first_name."\" LastName=\"".$last_name."\" Email=\"".$email."\" PhoneNumber=\"".$phonenumber."\" xmlns=\"http://www.pesapal.com\" />";
         $post_xml = h($post_xml);
 
 
@@ -139,7 +139,7 @@ class Pesapal {
      * Use this to post a transaction to PesaPal. PesaPal will return a response
      * with a page which contains the available payment options and will
      * redirect to your site once the user has completed the payment process. A
-     * tracking id will be returned as a query parameter – this can be used
+     * tracking id will be returned as a query parameter ï¿½ this can be used
      * subsequently to track the payment status on pesapal for this transaction.
      *
      * @param String  $callback_url 
