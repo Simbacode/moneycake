@@ -14,13 +14,12 @@ namespace Simbacode\Moneycake;
 use Simbacode\Moneycake\Oauth\OAuthSignatureMethod_HMAC_SHA1;
 use Simbacode\Moneycake\Oauth\OAuthConsumer;
 use Simbacode\Moneycake\Oauth\OAuthRequest;
-use Cake\Network\Http\Client;
 
 /**
  * This is main Pesapal Oauth 1.0 cakePHP class
  *
  * @author Acellam Guy
- * @version 0.0.1
+ * @version 1.0.0
  */
 class Pesapal {
 
@@ -44,7 +43,6 @@ class Pesapal {
     private $http = NULL;
     private $OauthRequest = NUll;
     private $OauthConsumer = NUll;
-    private $HttpRequest = NUll;
 
     //https://www.pesapal.com/API/PostPesapalDirectOrderV4 when you are ready to go live!
 
@@ -72,14 +70,16 @@ class Pesapal {
     public function getOauthRequest() {
         return $this->OauthRequest;
     }
-       /**
+
+    /**
      * A getter method used to return the request that was made to pesapal server
      * @return \Cake\Network\Http\Request
      */
     public function getHttpRequest() {
         return $this->HttpRequest;
     }
-       /**
+
+    /**
      * A getter method used to return the OauthConsumer used
      * @return OAuthConsumer
      */
@@ -114,11 +114,11 @@ class Pesapal {
      * @param last_name
      * @return OAuthRequest
      */
-    public function PostPesapalDirectOrderV4($callback_url, $amount,$currency, $desc, $type, $reference, $email, $phonenumber, $first_name, $last_name) {
+    public function PostPesapalDirectOrderV4($callback_url, $amount, $currency, $desc, $type, $reference, $email, $phonenumber, $first_name, $last_name) {
 
         $this->url = $this->http . "pesapal.com/api/PostPesapalDirectOrderV4";
-        $post_xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><PesapalDirectOrderInfo xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" Amount=\"".$amount."\" Currency=\"".$currency."\" Description=\"".$desc."\" Type=\"".$type."\" Reference=\"".$reference."\" FirstName=\"".$first_name."\" LastName=\"".$last_name."\" Email=\"".$email."\" PhoneNumber=\"".$phonenumber."\" xmlns=\"http://www.pesapal.com\" />";
-        $post_xml = h($post_xml);
+        $post_xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><PesapalDirectOrderInfo xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" Amount=\"" . $amount . "\" Currency=\"" . $currency . "\" Description=\"" . $desc . "\" Type=\"" . $type . "\" Reference=\"" . $reference . "\" FirstName=\"" . $first_name . "\" LastName=\"" . $last_name . "\" Email=\"" . $email . "\" PhoneNumber=\"" . $phonenumber . "\" xmlns=\"http://www.pesapal.com\" />";
+        $post_xml = htmlspecialchars($post_xml);
 
 
         $this->OauthConsumer = new OAuthConsumer($this->consumer_key, $this->consumer_secret);
@@ -128,7 +128,7 @@ class Pesapal {
         $this->OauthRequest->set_parameter("oauth_callback", $callback_url);
         $this->OauthRequest->set_parameter("pesapal_request_data", $post_xml);
         $this->OauthRequest->sign_request($this->signature_method, $this->OauthConsumer, $this->token);
-        
+
         return $this->OauthRequest;
     }
 
@@ -153,7 +153,7 @@ class Pesapal {
     public function PostPesapalDirectOrderV4XML($callback_url, $post_xml) {
         $this->url = $this->http . "pesapal.com/api/PostPesapalDirectOrderV4";
 
-        $post_xml = h($post_xml);
+        $post_xml = htmlspecialchars($post_xml);
 
         $this->OauthConsumer = new OAuthConsumer($this->consumer_key, $this->consumer_secret);
 
@@ -162,7 +162,7 @@ class Pesapal {
         $this->OauthRequest->set_parameter("oauth_callback", $callback_url);
         $this->OauthRequest->set_parameter("pesapal_request_data", $post_xml);
         $this->OauthRequest->sign_request($this->signature_method, $this->OauthConsumer, $this->token);
-        
+
         return $this->OauthRequest;
     }
 
@@ -193,8 +193,14 @@ class Pesapal {
         $this->OauthRequest->set_parameter("pesapal_transaction_tracking_id", $trackingId);
         $this->OauthRequest->sign_request($this->signature_method, $this->OauthConsumer, $this->token);
 
-        $this->HttpRequest = new Client();
-        $response = $this->HttpRequest->get($this->OauthRequest->to_url());
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => $this->OauthRequest->to_url()
+        ));
+        $response = curl_exec($curl);
+        // Close request to clear up some resources
+        curl_close($curl);
+
         return $response;
     }
 
@@ -217,8 +223,14 @@ class Pesapal {
         $this->OauthRequest->set_parameter("pesapal_merchant_reference", $reference);
         $this->OauthRequest->sign_request($this->signature_method, $this->OauthConsumer, $this->token);
 
-        $this->HttpRequest = new Client();
-        $response = $this->HttpRequest->get($this->OauthRequest->to_url());
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => $this->OauthRequest->to_url()
+        ));
+        $response = curl_exec($curl);
+        // Close request to clear up some resources
+        curl_close($curl);
+
         return $response;
     }
 
@@ -246,8 +258,13 @@ class Pesapal {
         $this->OauthRequest->set_parameter("pesapal_transaction_tracking_id", $trackingId);
         $this->OauthRequest->sign_request($this->signature_method, $this->OauthConsumer, $this->token);
 
-        $this->HttpRequest = new Client();
-        $response = $this->HttpRequest->get($this->OauthRequest->to_url());
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => $this->OauthRequest->to_url()
+        ));
+        $response = curl_exec($curl);
+        // Close request to clear up some resources
+        curl_close($curl);
         return $response;
     }
 
@@ -274,8 +291,6 @@ class Pesapal {
      *                  {@link Pesapal#PostPesapalDirectOrderV4}
      * @param trackingId
      *                  the reference that was returned by pesapal server during 
-     *                  post
-     * @param Boolean $printResponse payment response to be printed
      * 
      * @param function $callback a function to indicated that database update 
      *                  was successfull
@@ -283,7 +298,7 @@ class Pesapal {
      *                  order
      * @return a boolean yes to indicate successfull IPN of failure. Null for nothing
      */
-    public function InstantPaymentNotification($notificationType, $reference, $trackingId,$printResponse=FALSE, $callback) {
+    public function InstantPaymentNotification($notificationType, $reference, $trackingId, $callback) {
 
         $this->url = $this->http . "pesapal.com/api/querypaymentstatus";
 
@@ -323,20 +338,17 @@ class Pesapal {
             curl_close($ch);
 
             //UPDATE YOUR DB TABLE WITH NEW STATUS FOR TRANSACTION WITH pesapal_transaction_tracking_id $pesapalTrackingId
-            if ($callback($status,$trackingId)) {
-                if($printResponse){
-                  $resp = "pesapal_notification_type=$notificationType&pesapal_transaction_tracking_id=$trackingId&pesapal_merchant_reference=$reference";
-                  ob_start();
-                  echo $resp;
-                  ob_flush();
-                  exit;
-                    
-                }
-            } 
+            if ($callback($status)&&$status != "PENDING") {
+
+                $resp = "pesapal_notification_type=$notificationType&pesapal_transaction_tracking_id=$trackingId&pesapal_merchant_reference=$reference";
+                ob_start();
+                echo $resp;
+                ob_flush();
+                exit;
+            }
         } else {
             return null;
         }
     }
-    
 
 }
