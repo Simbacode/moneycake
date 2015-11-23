@@ -82,7 +82,7 @@ public function IPN() {
         $pesapal = new Simbacode\Moneycake\Pesapal(true, "YOUR-KEY", "YOUR-SECRET");
 
 
-        $this->pesapal->InstantPaymentNotification($pesapalNotification, $reference, $pesapal_tracking_id, function($status) {
+        $pesapal->InstantPaymentNotification($pesapalNotification, $reference, $pesapal_tracking_id, function($status) {
 
             if ($status != 'PENDING') {
 
