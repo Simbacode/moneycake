@@ -3,31 +3,31 @@ Moneycake
 
 This a mobile money library for PHP.
 
-## Requirements ##
+##### Requirements #####
 * PHP 5.4.16+
 * curl enabled
 
 
-## Mobile Money Gateways ##
+##### Mobile Money Gateways #####
 * pesapal 
 
 
-## How to use ##
+##### How to use #####
 This a composer library and hence it is easy to use.
 
-### Using Composer ###
+##### Using Composer #####
 
 ```
 require: "simbacode/moneycake": "dev-master"
 ```
-### Git Clone ###
+##### Git Clone #####
 You can as well clone the library in your vendor folder but remember to add this library to autorun.
 ```
 git clone https://github.com/Simbacode/moneycake
 ```
 
 
-## Codeigniter PostPesapalDirectOrderV4 Example ##
+##### Codeigniter PostPesapalDirectOrderV4 Example #####
 ```php
 <?php
 $pesapal = new Simbacode\Moneycake\Pesapal(true, "YOUR-KEY", "YOUR-SECRET");
@@ -60,7 +60,7 @@ if (!empty($amount) && !empty($description) && !empty($transaction_id) && !empty
 ?>
 ```
 
-## Codeigniter IPN Example ##
+##### Codeigniter IPN Example #####
 ```php
 <?php
 public function IPN() {
