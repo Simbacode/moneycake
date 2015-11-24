@@ -18,7 +18,7 @@ This a composer library and hence it is easy to use.
 ##### Using Composer #####
 
 ```
-require: "simbacode/moneycake": "dev-master"
+require: "simbacode/moneycake": "1.0.0"
 ```
 ##### Git Clone #####
 You can as well clone the library in your vendor folder but remember to add this library to autorun.
