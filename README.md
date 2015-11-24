@@ -66,10 +66,6 @@ if (!empty($amount) && !empty($description) && !empty($transaction_id) && !empty
 public function IPN() {
 
         //FROM PESAPAL
-        $this->data['view'] = 'backend/querypayments';
-        $this->data['viewstatus'] = 'dashboard';
-
-
         $reference = null;
         $pesapal_tracking_id = null;
         if (isset($_GET['pesapal_merchant_reference']))
