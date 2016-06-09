@@ -292,13 +292,98 @@ class Pesapal {
      * @param trackingId
      *                  the reference that was returned by pesapal server during 
      * 
+     *                  order
+     * @return a boolean yes to indicate successfull IPN of failure. Null for nothing
+     */
+    public function InstantPaymentNotification($notificationType, $reference, $trackingId) {
+
+        $this->url = $this->http . "pesapal.com/api/querypaymentstatus";
+
+        if ($notificationType == "CHANGE" && $trackingId != "") {
+
+            $this->OauthConsumer = new OAuthConsumer($this->consumer_key, $this->consumer_secret);
+
+            //get transaction status
+            $this->OauthRequest = OAuthRequest::from_consumer_and_token($this->OauthConsumer, $this->token, "GET", $this->url, $this->params);
+            $this->OauthRequest->set_parameter("pesapal_merchant_reference", $reference);
+            $this->OauthRequest->set_parameter("pesapal_transaction_tracking_id", $trackingId);
+            $this->OauthRequest->sign_request($this->signature_method, $this->OauthConsumer, $this->token);
+            
+            
+            
+            $ch = curl_init();
+            
+            curl_setopt($ch, CURLOPT_URL, $this->OauthRequest);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_HEADER, 1);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+            
+            if (defined('CURL_PROXY_REQUIRED'))
+                if (CURL_PROXY_REQUIRED == 'True') {
+                    $proxy_tunnel_flag = (defined('CURL_PROXY_TUNNEL_FLAG') && strtoupper(CURL_PROXY_TUNNEL_FLAG) == 'FALSE') ? false : true;
+                    curl_setopt($ch, CURLOPT_HTTPPROXYTUNNEL, $proxy_tunnel_flag);
+                    curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
+                    curl_setopt($ch, CURLOPT_PROXY, CURL_PROXY_SERVER_DETAILS);
+                }
+
+            $response = curl_exec($ch);
+            
+            //var_dump($response);
+
+            $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+            $raw_header = substr($response, 0, $header_size - 4);
+            $headerArray = explode("\r\n\r\n", $raw_header);
+            $header = $headerArray[count($headerArray) - 1];
+
+            //transaction status
+            $elements = preg_split("/=/", substr($response, $header_size));
+            $status = $elements[1];
+            curl_close($ch);
+
+
+            //$resp = "pesapal_notification_type=$notificationType&pesapal_transaction_tracking_id=$trackingId&pesapal_merchant_reference=$reference";
+            //ob_start();
+            //echo $resp;
+            //ob_flush();
+            //exit;
+            return $status;
+        } else {
+            return "";
+        }
+    }
+
+    /**
+     * This is to be used with an action configured to receive IPN as indicated
+     * by pesapal. When the action recieves request from Pesapal, Get the 
+     * parameters and pass the details to this function.
+     * you will receive transaction status in the format:
+     * pesapal_notification_type=CHANGE&pesapal_transaction_tracking_id =<the
+     * unique tracking id of the transaction>&pesapal_merchant_reference=<the
+     * merchant reference>. Also remember to parse the header of this response
+     * to get the payment status.
+     * 
+     * After that remember to send back a response to pesapal in the same format
+     * using your web app.This is to acknowledge the receipt of the sent IPN.
+     * Send back the response after doing some things such as updating records
+     * in your data store.
+     *
+     *
+     * @param String $notificationType
+     *                  this one of the notification types specified by pesapal
+     * @param String $reference
+     *                  the order id/ reference id you created during
+     *                  {@link Pesapal#PostPesapalDirectOrderV4}
+     * @param trackingId
+     *                  the reference that was returned by pesapal server during 
+     * 
      * @param function $callback a function to indicated that database update 
      *                  was successfull
      * 
      *                  order
      * @return a boolean yes to indicate successfull IPN of failure. Null for nothing
      */
-    public function InstantPaymentNotification($notificationType, $reference, $trackingId, $callback) {
+    public function InstantPaymentNotificationWithCallback($notificationType, $reference, $trackingId, $callback) {
 
         $this->url = $this->http . "pesapal.com/api/querypaymentstatus";
 
@@ -338,7 +423,7 @@ class Pesapal {
             curl_close($ch);
 
             //UPDATE YOUR DB TABLE WITH NEW STATUS FOR TRANSACTION WITH pesapal_transaction_tracking_id $pesapalTrackingId
-            if ($callback($status)&&$status != "PENDING") {
+            if ($callback($status) && $status != "PENDING") {
 
                 $resp = "pesapal_notification_type=$notificationType&pesapal_transaction_tracking_id=$trackingId&pesapal_merchant_reference=$reference";
                 ob_start();
